@@ -55,9 +55,16 @@
       width: 100%;
     }
 
-    .card {
-      position: relative;
+    .stack {
       width: min(940px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card,
+    .status-panel {
+      position: relative;
       background: var(--glass);
       border-radius: 28px;
       padding: clamp(22px, 4vw, 38px);
@@ -67,7 +74,8 @@
       overflow: hidden;
     }
 
-    .card::before {
+    .card::before,
+    .status-panel::before {
       content: "";
       position: absolute;
       inset: 0;
@@ -137,21 +145,70 @@
       line-height: 1.7;
     }
 
-    .status-chip {
-      width: min(520px, 90%);
-      background: rgba(255, 255, 255, 0.82);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.22);
-      border-radius: 18px;
-      padding: 10px;
-      backdrop-filter: blur(14px) saturate(130%);
+    details.status-panel {
+      padding: 0;
     }
 
-    iframe {
+    details[open] .status-body { opacity: 1; max-height: 320px; margin-top: 14px; }
+    details:not([open]) .status-body { opacity: 0; max-height: 0; margin-top: 0; }
+
+    .status-header {
+      position: relative;
+      z-index: 1;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+    }
+
+    .status-header::-webkit-details-marker { display: none; }
+
+    .status-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .status-tagline {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status-chevron {
+      margin-left: auto;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    details[open] .status-chevron { transform: rotate(180deg); background: rgba(255, 255, 255, 0.92); }
+
+    .status-body {
+      position: relative;
+      z-index: 1;
+      padding: 0 20px 20px;
+      transition: all 0.28s ease;
+      overflow: hidden;
+    }
+
+    .status-frame {
       width: 100%;
-      height: 180px;
+      height: 260px;
       border: none;
-      border-radius: 12px;
+      border-radius: 16px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.78);
     }
 
     .logo-wrap {
@@ -198,8 +255,8 @@
 
     @media (max-width: 640px) {
       body { padding: 18px; }
-      .card { border-radius: 22px; }
-      .status-chip { width: 100%; }
+      .card,
+      .status-panel { border-radius: 22px; }
     }
   </style>
 </head>
@@ -209,54 +266,77 @@
   <div class="blur-petal petal-3" aria-hidden="true"></div>
 
   <div class="content">
-    <main class="card" aria-labelledby="title">
-      <div class="card-inner">
-        <h1 id="title">about:blank</h1>
-        <p class="tagline">你被带到了一个“空白”空间。可能是下面的某个原因把你送到这里：</p>
+    <div class="stack">
+      <main class="card" aria-labelledby="title">
+        <div class="card-inner">
+          <h1 id="title">about:blank</h1>
+          <p class="tagline">你被带到了一个“空白”空间。可能是下面的某个原因把你送到这里：</p>
 
-        <ul class="reasons" aria-label="可能原因列表">
-          <li class="reason">
-            <span class="emoji" aria-hidden="true">🧹</span>
-            <div>
-              <strong>页面在做大扫除</strong>
-              <span>功能升级或代码重构进行中，等它打理完毕就会重新开放。</span>
-            </div>
-          </li>
-          <li class="reason">
-            <span class="emoji" aria-hidden="true">🚧</span>
-            <div>
-              <strong>Bug 过多，正在封闭修缮</strong>
-              <span>为了不影响体验，暂时把它移到了小黑屋里集中处理。</span>
-            </div>
-          </li>
-          <li class="reason">
-            <span class="emoji" aria-hidden="true">🔒</span>
-            <div>
-              <strong>尚未对外开放</strong>
-              <span>这个入口可能属于灰度或测试通道，请稍后再来看看。</span>
-            </div>
-          </li>
-          <li class="reason">
-            <span class="emoji" aria-hidden="true">🧭</span>
-            <div>
-              <strong>你走进了一条未铺好的路</strong>
-              <span>链接可能失效或仍在建设，返回上一页或前往主页继续探索。</span>
-            </div>
-          </li>
-        </ul>
+          <ul class="reasons" aria-label="可能原因列表">
+            <li class="reason">
+              <span class="emoji" aria-hidden="true">🧹</span>
+              <div>
+                <strong>页面在做大扫除</strong>
+                <span>功能升级或代码重构进行中，等它打理完毕就会重新开放。</span>
+              </div>
+            </li>
+            <li class="reason">
+              <span class="emoji" aria-hidden="true">🚧</span>
+              <div>
+                <strong>Bug 过多，正在封闭修缮</strong>
+                <span>为了不影响体验，暂时把它移到了小黑屋里集中处理。</span>
+              </div>
+            </li>
+            <li class="reason">
+              <span class="emoji" aria-hidden="true">🔒</span>
+              <div>
+                <strong>尚未对外开放</strong>
+                <span>这个入口可能属于灰度或测试通道，请稍后再来看看。</span>
+              </div>
+            </li>
+            <li class="reason">
+              <span class="emoji" aria-hidden="true">🧭</span>
+              <div>
+                <strong>你走进了一条未铺好的路</strong>
+                <span>链接可能失效或仍在建设，返回上一页或前往主页继续探索。</span>
+              </div>
+            </li>
+          </ul>
 
-        <p class="note">我们会尽快把路牌修好，感谢耐心等待。服务器当前状态可在下方查看，刷新即可获取最新信息。</p>
-      </div>
-    </main>
-  </div>
+          <p class="note">我们会尽快把路牌修好，感谢耐心等待。服务器当前状态可在下方查看，刷新即可获取最新信息。</p>
+        </div>
+      </main>
 
-  <div class="status-chip" aria-label="服务状态面板">
-    <iframe src="https://main.kangqiovo.com/status/kangqistart" title="服务状态"></iframe>
+      <details class="status-panel" open aria-label="服务状态面板">
+        <summary class="status-header" aria-expanded="true">
+          <div>
+            <div class="status-title">服务状态</div>
+            <p class="status-tagline">实时了解 KangQi 服务的可用性与运行情况。</p>
+          </div>
+          <span class="status-chevron" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="status-body">
+          <iframe class="status-frame" src="https://main.kangqiovo.com/status/kangqistart" title="服务状态"></iframe>
+        </div>
+      </details>
+    </div>
   </div>
 
   <div class="logo-wrap">
     <img class="logo" src="icon.png" alt="About Blank Logo" loading="lazy">
     <a class="signature" href="https://kangqiovo.com">©KangQi 2025-2026</a>
   </div>
+  <script>
+    const statusPanel = document.querySelector('.status-panel');
+    const statusSummary = statusPanel?.querySelector('.status-header');
+
+    function syncAria() {
+      if (!statusPanel || !statusSummary) return;
+      statusSummary.setAttribute('aria-expanded', statusPanel.open ? 'true' : 'false');
+    }
+
+    statusPanel?.addEventListener('toggle', syncAria);
+    syncAria();
+  </script>
 </body>
 </html>
