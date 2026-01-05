@@ -20,8 +20,11 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
       padding: 28px;
       font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       color: var(--text);
@@ -43,6 +46,14 @@
     .petal-1 { top: 18%; left: 20%; background: #c5d1ff; }
     .petal-2 { top: 70%; left: 15%; background: #dbe7ff; }
     .petal-3 { top: 40%; left: 82%; background: #bcc8ff; }
+
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
 
     .card {
       position: relative;
@@ -127,10 +138,7 @@
     }
 
     .status-chip {
-      position: fixed;
-      right: 22px;
-      bottom: 22px;
-      width: min(340px, 52vw);
+      width: min(520px, 90%);
       background: rgba(255, 255, 255, 0.82);
       border: 1px solid rgba(255, 255, 255, 0.6);
       box-shadow: 0 18px 36px rgba(15, 23, 42, 0.22);
@@ -147,10 +155,11 @@
     }
 
     .logo-wrap {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
       text-align: center;
     }
 
@@ -190,11 +199,7 @@
     @media (max-width: 640px) {
       body { padding: 18px; }
       .card { border-radius: 22px; }
-      .status-chip {
-        position: static;
-        width: 100%;
-        margin-top: 16px;
-      }
+      .status-chip { width: 100%; }
     }
   </style>
 </head>
@@ -203,45 +208,47 @@
   <div class="blur-petal petal-2" aria-hidden="true"></div>
   <div class="blur-petal petal-3" aria-hidden="true"></div>
 
-  <main class="card" aria-labelledby="title">
-    <div class="card-inner">
-      <h1 id="title">about:blank</h1>
-      <p class="tagline">你被带到了一个“空白”空间。可能是下面的某个原因把你送到这里：</p>
+  <div class="content">
+    <main class="card" aria-labelledby="title">
+      <div class="card-inner">
+        <h1 id="title">about:blank</h1>
+        <p class="tagline">你被带到了一个“空白”空间。可能是下面的某个原因把你送到这里：</p>
 
-      <ul class="reasons" aria-label="可能原因列表">
-        <li class="reason">
-          <span class="emoji" aria-hidden="true">🧹</span>
-          <div>
-            <strong>页面在做大扫除</strong>
-            <span>功能升级或代码重构进行中，等它打理完毕就会重新开放。</span>
-          </div>
-        </li>
-        <li class="reason">
-          <span class="emoji" aria-hidden="true">🚧</span>
-          <div>
-            <strong>Bug 过多，正在封闭修缮</strong>
-            <span>为了不影响体验，暂时把它移到了小黑屋里集中处理。</span>
-          </div>
-        </li>
-        <li class="reason">
-          <span class="emoji" aria-hidden="true">🔒</span>
-          <div>
-            <strong>尚未对外开放</strong>
-            <span>这个入口可能属于灰度或测试通道，请稍后再来看看。</span>
-          </div>
-        </li>
-        <li class="reason">
-          <span class="emoji" aria-hidden="true">🧭</span>
-          <div>
-            <strong>你走进了一条未铺好的路</strong>
-            <span>链接可能失效或仍在建设，返回上一页或前往主页继续探索。</span>
-          </div>
-        </li>
-      </ul>
+        <ul class="reasons" aria-label="可能原因列表">
+          <li class="reason">
+            <span class="emoji" aria-hidden="true">🧹</span>
+            <div>
+              <strong>页面在做大扫除</strong>
+              <span>功能升级或代码重构进行中，等它打理完毕就会重新开放。</span>
+            </div>
+          </li>
+          <li class="reason">
+            <span class="emoji" aria-hidden="true">🚧</span>
+            <div>
+              <strong>Bug 过多，正在封闭修缮</strong>
+              <span>为了不影响体验，暂时把它移到了小黑屋里集中处理。</span>
+            </div>
+          </li>
+          <li class="reason">
+            <span class="emoji" aria-hidden="true">🔒</span>
+            <div>
+              <strong>尚未对外开放</strong>
+              <span>这个入口可能属于灰度或测试通道，请稍后再来看看。</span>
+            </div>
+          </li>
+          <li class="reason">
+            <span class="emoji" aria-hidden="true">🧭</span>
+            <div>
+              <strong>你走进了一条未铺好的路</strong>
+              <span>链接可能失效或仍在建设，返回上一页或前往主页继续探索。</span>
+            </div>
+          </li>
+        </ul>
 
-      <p class="note">我们会尽快把路牌修好，感谢耐心等待。服务器当前状态可在右下角查看，刷新即可获取最新信息。</p>
-    </div>
-  </main>
+        <p class="note">我们会尽快把路牌修好，感谢耐心等待。服务器当前状态可在下方查看，刷新即可获取最新信息。</p>
+      </div>
+    </main>
+  </div>
 
   <div class="status-chip" aria-label="服务状态面板">
     <iframe src="https://main.kangqiovo.com/status/kangqistart" title="服务状态"></iframe>
