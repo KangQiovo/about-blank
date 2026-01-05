@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/icon.png">
   <title>about:blank</title>
   <style>
     :root {
-      --bg: radial-gradient(circle at 20% 20%, #f5f7fb, #e3e8ff 40%, #d3d8ff 70%, #f8f9ff 100%);
-      --card-bg: rgba(255, 255, 255, 0.85);
-      --text: #1c1f33;
-      --accent: #5a6dff;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      --glass: rgba(255, 255, 255, 0.78);
+      --glass-border: rgba(255, 255, 255, 0.35);
+      --text: #0f172a;
+      --muted: #4b5563;
+      --accent: #7c8bff;
+      --shadow: 0 20px 80px rgba(15, 23, 42, 0.18);
     }
 
     * { box-sizing: border-box; }
@@ -20,87 +22,234 @@
       min-height: 100vh;
       display: grid;
       place-items: center;
-      background: var(--bg);
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 28px;
+      font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       color: var(--text);
-      padding: 24px;
+      background: radial-gradient(circle at 20% 20%, #eef3ff 0, #e6edff 25%, #cdd8ff 50%, #dbe5ff 65%, #eef3ff 100%);
+      position: relative;
+      overflow: hidden;
     }
 
+    .blur-petal {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      filter: blur(80px);
+      opacity: 0.8;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .petal-1 { top: 18%; left: 20%; background: #c5d1ff; }
+    .petal-2 { top: 70%; left: 15%; background: #dbe7ff; }
+    .petal-3 { top: 40%; left: 82%; background: #bcc8ff; }
+
     .card {
-      width: min(900px, 100%);
-      background: var(--card-bg);
-      border-radius: 18px;
-      padding: 28px 32px;
+      position: relative;
+      width: min(940px, 100%);
+      background: var(--glass);
+      border-radius: 28px;
+      padding: clamp(22px, 4vw, 38px);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      text-align: center;
-      border: 1px solid rgba(90, 109, 255, 0.12);
+      backdrop-filter: blur(18px) saturate(135%);
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.32), rgba(124, 139, 255, 0.07));
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
     }
 
     h1 {
-      margin: 0 0 8px;
-      font-size: clamp(28px, 4vw, 36px);
-      letter-spacing: -0.02em;
+      margin: 0 0 10px;
+      font-size: clamp(30px, 5vw, 40px);
+      letter-spacing: -0.03em;
     }
 
     .tagline {
-      margin: 0 0 20px;
+      margin: 0 0 24px;
       font-size: 16px;
-      color: #4a5070;
+      color: var(--muted);
+      line-height: 1.7;
     }
 
-    .status-wrapper {
-      background: #f5f7ff;
-      border: 1px solid rgba(90, 109, 255, 0.15);
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    .reasons {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .reason {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+    }
+
+    .reason .emoji {
+      font-size: 18px;
+    }
+
+    .reason strong {
+      display: block;
+      font-weight: 700;
+    }
+
+    .reason span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .note {
+      margin: 24px 0 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .status-chip {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: min(340px, 52vw);
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.22);
+      border-radius: 18px;
+      padding: 10px;
+      backdrop-filter: blur(14px) saturate(130%);
     }
 
     iframe {
       width: 100%;
-      height: 420px;
+      height: 180px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
     }
 
-    .note {
-      margin: 16px auto 0;
-      color: #61688f;
-      font-size: 14px;
-      max-width: 640px;
-      line-height: 1.6;
+    .logo-wrap {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
     }
 
     .logo {
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      height: 48px;
-      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
-      transition: transform 0.2s ease, filter 0.2s ease;
+      height: 52px;
+      filter: drop-shadow(0 10px 22px rgba(15, 23, 42, 0.18));
+      transition: transform 0.25s ease, filter 0.25s ease;
       user-select: none;
     }
 
     .logo:hover {
-      transform: translateX(-50%) translateY(-2px) scale(1.02);
-      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.22));
+      transform: translateY(-2px) scale(1.02);
+      filter: drop-shadow(0 14px 26px rgba(15, 23, 42, 0.22));
+    }
+
+    .signature {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #1f2937;
+      text-decoration: none;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(6px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .signature:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 18px; }
+      .card { border-radius: 22px; }
+      .status-chip {
+        position: static;
+        width: 100%;
+        margin-top: 16px;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="blur-petal petal-1" aria-hidden="true"></div>
+  <div class="blur-petal petal-2" aria-hidden="true"></div>
+  <div class="blur-petal petal-3" aria-hidden="true"></div>
+
   <main class="card" aria-labelledby="title">
-    <h1 id="title">about:blank</h1>
-    <p class="tagline">这里曾经有个页面，但它正在休假或者被关小黑屋了。</p>
+    <div class="card-inner">
+      <h1 id="title">about:blank</h1>
+      <p class="tagline">你被带到了一个“空白”空间。可能是下面的某个原因把你送到这里：</p>
 
-    <div class="status-wrapper" aria-label="服务状态面板">
-      <iframe src="https://main.kangqiovo.com/status/kangqistart" title="服务状态"></iframe>
+      <ul class="reasons" aria-label="可能原因列表">
+        <li class="reason">
+          <span class="emoji" aria-hidden="true">🧹</span>
+          <div>
+            <strong>页面在做大扫除</strong>
+            <span>功能升级或代码重构进行中，等它打理完毕就会重新开放。</span>
+          </div>
+        </li>
+        <li class="reason">
+          <span class="emoji" aria-hidden="true">🚧</span>
+          <div>
+            <strong>Bug 过多，正在封闭修缮</strong>
+            <span>为了不影响体验，暂时把它移到了小黑屋里集中处理。</span>
+          </div>
+        </li>
+        <li class="reason">
+          <span class="emoji" aria-hidden="true">🔒</span>
+          <div>
+            <strong>尚未对外开放</strong>
+            <span>这个入口可能属于灰度或测试通道，请稍后再来看看。</span>
+          </div>
+        </li>
+        <li class="reason">
+          <span class="emoji" aria-hidden="true">🧭</span>
+          <div>
+            <strong>你走进了一条未铺好的路</strong>
+            <span>链接可能失效或仍在建设，返回上一页或前往主页继续探索。</span>
+          </div>
+        </li>
+      </ul>
+
+      <p class="note">我们会尽快把路牌修好，感谢耐心等待。服务器当前状态可在右下角查看，刷新即可获取最新信息。</p>
     </div>
-
-    <p class="note">别紧张，服务器还在努力工作。等它睡醒或者修好 bug，我们就把正片放回来了。收藏此页或刷新看看最新状态吧。</p>
   </main>
 
-  <img class="logo" src="icon.png" alt="About Blank Logo" loading="lazy">
+  <div class="status-chip" aria-label="服务状态面板">
+    <iframe src="https://main.kangqiovo.com/status/kangqistart" title="服务状态"></iframe>
+  </div>
+
+  <div class="logo-wrap">
+    <img class="logo" src="icon.png" alt="About Blank Logo" loading="lazy">
+    <a class="signature" href="https://kangqiovo.com">©KangQi 2025-2026</a>
+  </div>
 </body>
 </html>
