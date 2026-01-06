@@ -1,1 +1,536 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/icon.png">
+  <title>about:blank</title>
+  <style>
+    :root {
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text: #e8ecf7;
+      --muted: #c3c8d6;
+      --accent: #6ad5ff;
+      --shadow: 0 24px 80px rgba(3, 7, 18, 0.65);
+    }
 
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 28px;
+      font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 20% 20%, rgba(84, 150, 255, 0.18), transparent 35%),
+        radial-gradient(circle at 80% 10%, rgba(255, 145, 234, 0.2), transparent 30%),
+        radial-gradient(circle at 30% 70%, rgba(124, 255, 197, 0.12), transparent 32%),
+        linear-gradient(140deg, #02060f, #050915, #0c1324 45%, #050915);
+      background-size: 220% 220%, 210% 210%, 180% 180%, 100% 100%;
+      animation: gradientShift 26s ease-in-out infinite;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .blur-petal {
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      filter: blur(120px);
+      opacity: 0.45;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+    }
+
+    .petal-1 { top: 16%; left: 18%; background: rgba(118, 188, 255, 0.4); }
+    .petal-2 { top: 68%; left: 12%; background: rgba(255, 143, 228, 0.35); }
+    .petal-3 { top: 42%; left: 84%; background: rgba(114, 255, 215, 0.3); }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%, 100% 50%, 0% 50%, 50% 50%; }
+      50% { background-position: 100% 50%, 0% 50%, 100% 50%, 50% 50%; }
+      100% { background-position: 0% 50%, 100% 50%, 0% 50%, 50% 50%; }
+    }
+
+    .code-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      mix-blend-mode: lighten;
+    }
+
+    .code-line {
+      position: absolute;
+      min-width: 220px;
+      max-width: 560px;
+      color: #d7ecff;
+      font-family: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 20% 20%, rgba(88, 164, 255, 0.18), rgba(10, 20, 35, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px) saturate(155%);
+      opacity: 0;
+      filter: blur(10px);
+      transition: opacity 0.55s ease, filter 0.55s ease, transform 0.55s ease;
+      white-space: pre;
+      text-shadow: 0 10px 28px rgba(8, 14, 29, 0.6);
+    }
+
+    .code-line.visible {
+      opacity: 0.96;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stack {
+      width: min(940px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card,
+    .status-panel {
+      position: relative;
+      background: var(--glass);
+      border-radius: 28px;
+      padding: clamp(22px, 4vw, 38px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px) saturate(135%);
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+    }
+
+    .card::before,
+    .status-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(74, 209, 255, 0.12));
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 5vw, 40px);
+      letter-spacing: -0.03em;
+    }
+
+    .tagline {
+      margin: 0 0 24px;
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .reasons {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .reason {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+    }
+
+    .reason .emoji {
+      font-size: 18px;
+    }
+
+    .reason strong {
+      display: block;
+      font-weight: 700;
+    }
+
+    .reason span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .note {
+      margin: 24px 0 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    details.status-panel {
+      padding: clamp(22px, 4vw, 38px);
+    }
+
+    details[open] .status-body { opacity: 1; max-height: 520px; margin-top: 18px; }
+    details:not([open]) .status-body { opacity: 0; max-height: 0; margin-top: 0; }
+
+    .status-header {
+      position: relative;
+      z-index: 1;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+    }
+
+    .status-header::-webkit-details-marker { display: none; }
+
+    .status-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .status-tagline {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status-chevron {
+      margin-left: auto;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    details[open] .status-chevron { transform: rotate(180deg); background: rgba(255, 255, 255, 0.16); }
+
+    .status-body {
+      position: relative;
+      z-index: 1;
+      padding: 0;
+      transition: all 0.28s ease;
+      overflow: hidden;
+    }
+
+    .status-frame {
+      width: 100%;
+      height: clamp(300px, 45vh, 420px);
+      border: none;
+      border-radius: 20px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      background: rgba(8, 11, 18, 0.75);
+    }
+
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    .logo {
+      height: 52px;
+      filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.35));
+      transition: transform 0.25s ease, filter 0.25s ease;
+      user-select: none;
+    }
+
+    .logo:hover {
+      transform: translateY(-2px) scale(1.02);
+      filter: drop-shadow(0 14px 26px rgba(15, 23, 42, 0.22));
+    }
+
+    .signature {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #e9eefc;
+      text-decoration: none;
+      padding: 6px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(6px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .signature:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 18px; }
+      .card,
+      .status-panel { border-radius: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="blur-petal petal-1" aria-hidden="true"></div>
+  <div class="blur-petal petal-2" aria-hidden="true"></div>
+  <div class="blur-petal petal-3" aria-hidden="true"></div>
+  <div class="code-canvas" aria-hidden="true"></div>
+
+  <div class="content">
+    <div class="stack">
+      <main class="card" aria-labelledby="title">
+        <div class="card-inner">
+          <h1 id="title">about:blank</h1>
+          <p class="tagline">你被带到了一个“空白”空间。可能是下面的某个原因把你送到这里：</p>
+
+          <ul class="reasons" aria-label="可能原因列表">
+            <li class="reason">
+              <span class="emoji" aria-hidden="true">🧹</span>
+              <div>
+                <strong>页面在做大扫除</strong>
+                <span>功能升级或代码重构进行中，等它打理完毕就会重新开放。</span>
+              </div>
+            </li>
+            <li class="reason">
+              <span class="emoji" aria-hidden="true">🚧</span>
+              <div>
+                <strong>Bug 过多，正在封闭修缮</strong>
+                <span>为了不影响体验，暂时把它移到了小黑屋里集中处理。</span>
+              </div>
+            </li>
+            <li class="reason">
+              <span class="emoji" aria-hidden="true">🔒</span>
+              <div>
+                <strong>尚未对外开放</strong>
+                <span>这个入口可能属于灰度或测试通道，请稍后再来看看。</span>
+              </div>
+            </li>
+            <li class="reason">
+              <span class="emoji" aria-hidden="true">🧭</span>
+              <div>
+                <strong>你走进了一条未铺好的路</strong>
+                <span>链接可能失效或仍在建设，返回上一页或前往主页继续探索。</span>
+              </div>
+            </li>
+          </ul>
+
+          <p class="note">我们会尽快把路牌修好，感谢耐心等待。服务器当前状态可在下方查看，刷新即可获取最新信息。</p>
+        </div>
+      </main>
+
+      <details class="status-panel" aria-label="服务状态面板">
+        <summary class="status-header" aria-expanded="false">
+          <div>
+            <div class="status-title">服务状态</div>
+            <p class="status-tagline">实时了解 KangQi 服务的可用性与运行情况。</p>
+          </div>
+          <span class="status-chevron" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="status-body">
+          <iframe class="status-frame" src="https://main.kangqiovo.com/status/kangqistart" title="服务状态"></iframe>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="logo-wrap">
+    <img class="logo" src="icon.png" alt="About Blank Logo" loading="lazy">
+    <a class="signature" href="https://kangqiovo.com">©KangQi 2025-2026</a>
+  </div>
+  <script>
+    const statusPanel = document.querySelector('.status-panel');
+    const statusSummary = statusPanel?.querySelector('.status-header');
+    const codeCanvas = document.querySelector('.code-canvas');
+
+    const codeSnippets = [
+      `const buffer = [];
+for (let i = 0; i < 32; i++) {
+  buffer.push(crypto.getRandomValues(new Uint32Array(1))[0]);
+}
+console.log('entropy', buffer.length);`,
+      `async function ping(url) {
+  const res = await fetch(url, { cache: 'no-store' });
+  return `${'${'}res.status${'}'} ${'${'}res.statusText${'}'}`;
+}
+await ping('/heartbeat');`,
+      `type RequestContext = {
+  traceId: string;
+  locale: string;
+  user?: { id: string; name: string };
+};
+
+function withTrace(ctx: RequestContext) {
+  return `${'${'}ctx.traceId${'}'}:${'${'}ctx.locale${'}'}`;
+}`,
+      `const timeline = [
+  { label: 'deploy', at: new Date() },
+  { label: 'warmup', at: new Date() },
+  { label: 'green', at: new Date() },
+];
+console.table(timeline);`,
+      `function backoff(attempt) {
+  return Math.min(1600, 100 * 2 ** attempt);
+}
+const retryMs = backoff(3);`,
+      `interface Health {
+  name: string;
+  status: 'up' | 'down' | 'degraded';
+  latency: number;
+}
+
+const heartbeat: Health = {
+  name: 'gateway',
+  status: 'up',
+  latency: 42,
+};`,
+      `const featureFlags = new Map([
+  ['labs.newUI', true],
+  ['beta.safeMode', false],
+]);
+
+console.info('flags', [...featureFlags.entries()]);`,
+      `fetch('/heartbeat')
+  .then((r) => r.json())
+  .then((json) => console.info('ok', json))
+  .catch((err) => console.warn('offline', err));`,
+      `const queue = ['prepare', 'rollout', 'monitor'];
+for (const step of queue) {
+  await new Promise((r) => setTimeout(r, 180));
+  console.log('step', step);
+}`,
+      `function checksum(payload) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
+}
+
+checksum('about:blank').then((hash) => {
+  console.debug('hash ready', hash.byteLength);
+});`,
+    ];
+
+    function syncAria() {
+      if (!statusPanel || !statusSummary) return;
+      statusSummary.setAttribute('aria-expanded', statusPanel.open ? 'true' : 'false');
+    }
+
+    statusPanel?.addEventListener('toggle', syncAria);
+    syncAria();
+
+    function spawnCodeLine() {
+      if (!codeCanvas) return;
+      const text = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+      const block = document.createElement('div');
+      block.className = 'code-line';
+
+      const cardWidth = 260 + Math.random() * 280;
+      block.style.width = `${cardWidth}px`;
+
+      const maxLeft = Math.max(16, window.innerWidth - cardWidth - 20);
+      const maxTop = Math.max(16, window.innerHeight - 180);
+
+      block.style.left = `${Math.random() * maxLeft}px`;
+      block.style.top = `${Math.random() * maxTop}px`;
+      block.style.transform = `translateY(${Math.random() * 18 - 9}px)`;
+
+      const lines = document.createElement('pre');
+      lines.className = 'code-text';
+      block.appendChild(lines);
+      codeCanvas.appendChild(block);
+
+      let index = 0;
+      const typingSpeed = 10 + Math.random() * 18;
+      const driftY = Math.random() * 12 - 6;
+      const reveal = () => {
+        lines.textContent = text.slice(0, index);
+        if (index < text.length) {
+          index++;
+          requestAnimationFrame(() => setTimeout(reveal, typingSpeed));
+        } else {
+          setTimeout(() => {
+              block.animate(
+                [
+                  { opacity: 0.96, filter: 'blur(0px)', transform: `translateY(${driftY}px)` },
+                  { opacity: 0, filter: 'blur(12px)', transform: `translateY(${driftY + 10}px)` },
+                ],
+                { duration: 1400, fill: 'forwards', easing: 'ease-in-out' }
+              ).onfinish = () => block.remove();
+            }, 2200 + Math.random() * 1600);
+          }
+      };
+
+      requestAnimationFrame(() => block.classList.add('visible'));
+      reveal();
+    }
+
+    function pumpCodeLines() {
+      const count = 6 + Math.floor(Math.random() * 5);
+      for (let i = 0; i < count; i++) {
+        setTimeout(spawnCodeLine, i * 180);
+      }
+    }
+
+    pumpCodeLines();
+    setInterval(pumpCodeLines, 2800);
+
+    document.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const key = event.key.toUpperCase();
+      const blockedCombos =
+        key === 'F12' ||
+        ((event.ctrlKey || event.metaKey) && ['S', 'U', 'P'].includes(key)) ||
+        (event.ctrlKey && event.shiftKey && ['I', 'J', 'C'].includes(key)) ||
+        (event.metaKey && event.shiftKey && ['I', 'J', 'C'].includes(key));
+
+      if (blockedCombos) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
+  </script>
+</body>
+</html>
