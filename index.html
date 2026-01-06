@@ -66,31 +66,32 @@
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
+      mix-blend-mode: screen;
     }
 
     .code-line {
       position: absolute;
-      min-width: 200px;
-      max-width: 520px;
-      color: #c9e7ff;
+      min-width: 220px;
+      max-width: 560px;
+      color: #d7ecff;
       font-family: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
       font-size: 13px;
-      line-height: 1.5;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(19, 28, 44, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(10px) saturate(145%);
+      line-height: 1.6;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 20% 20%, rgba(88, 164, 255, 0.18), rgba(10, 20, 35, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px) saturate(155%);
       opacity: 0;
-      filter: blur(8px);
-      transition: opacity 0.45s ease, filter 0.45s ease, transform 0.45s ease;
+      filter: blur(10px);
+      transition: opacity 0.55s ease, filter 0.55s ease, transform 0.55s ease;
       white-space: pre;
-      text-shadow: 0 10px 28px rgba(8, 14, 29, 0.5);
+      text-shadow: 0 10px 28px rgba(8, 14, 29, 0.6);
     }
 
     .code-line.visible {
-      opacity: 0.92;
+      opacity: 0.96;
       filter: blur(0);
       transform: translateY(0);
     }
@@ -462,9 +463,12 @@ checksum('about:blank').then((hash) => {
       const text = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
       const block = document.createElement('div');
       block.className = 'code-line';
-      block.style.top = `${Math.random() * 88 + 2}%`;
-      block.style.left = `${Math.random() * 86 + 2}%`;
-      block.style.transform = `translateY(${Math.random() * 14 - 7}px)`;
+
+      const safeTop = Math.random() * 88 + 2;
+      const safeLeft = Math.random() * 88 + 2;
+      block.style.top = `${safeTop}%`;
+      block.style.left = `${safeLeft}%`;
+      block.style.transform = `translate(-50%, -50%) translateY(${Math.random() * 16 - 8}px)`;
 
       const lines = document.createElement('pre');
       lines.className = 'code-text';
@@ -472,8 +476,8 @@ checksum('about:blank').then((hash) => {
       codeCanvas.appendChild(block);
 
       let index = 0;
-      const typingSpeed = 14 + Math.random() * 18;
-      const driftY = Math.random() * 10 - 5;
+      const typingSpeed = 10 + Math.random() * 18;
+      const driftY = Math.random() * 12 - 6;
       const reveal = () => {
         lines.textContent = text.slice(0, index);
         if (index < text.length) {
@@ -483,12 +487,12 @@ checksum('about:blank').then((hash) => {
           setTimeout(() => {
             block.animate(
               [
-                { opacity: 0.92, filter: 'blur(0px)', transform: `translateY(${driftY}px)` },
-                { opacity: 0, filter: 'blur(10px)', transform: `translateY(${driftY + 8}px)` },
+                { opacity: 0.96, filter: 'blur(0px)', transform: `translate(-50%, -50%) translateY(${driftY}px)` },
+                { opacity: 0, filter: 'blur(12px)', transform: `translate(-50%, -50%) translateY(${driftY + 10}px)` },
               ],
-              { duration: 1200, fill: 'forwards', easing: 'ease-in-out' }
+              { duration: 1400, fill: 'forwards', easing: 'ease-in-out' }
             ).onfinish = () => block.remove();
-          }, 2000 + Math.random() * 1400);
+          }, 2200 + Math.random() * 1600);
         }
       };
 
@@ -497,14 +501,32 @@ checksum('about:blank').then((hash) => {
     }
 
     function pumpCodeLines() {
-      const count = 4 + Math.floor(Math.random() * 4);
+      const count = 6 + Math.floor(Math.random() * 5);
       for (let i = 0; i < count; i++) {
         setTimeout(spawnCodeLine, i * 180);
       }
     }
 
     pumpCodeLines();
-    setInterval(pumpCodeLines, 3000);
+    setInterval(pumpCodeLines, 2800);
+
+    document.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const key = event.key.toUpperCase();
+      const blockedCombos =
+        key === 'F12' ||
+        ((event.ctrlKey || event.metaKey) && ['S', 'U', 'P'].includes(key)) ||
+        (event.ctrlKey && event.shiftKey && ['I', 'J', 'C'].includes(key)) ||
+        (event.metaKey && event.shiftKey && ['I', 'J', 'C'].includes(key));
+
+      if (blockedCombos) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
   </script>
 </body>
 </html>
