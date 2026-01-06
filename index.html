@@ -66,7 +66,7 @@
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
-      mix-blend-mode: screen;
+      mix-blend-mode: lighten;
     }
 
     .code-line {
@@ -464,11 +464,15 @@ checksum('about:blank').then((hash) => {
       const block = document.createElement('div');
       block.className = 'code-line';
 
-      const safeTop = Math.random() * 88 + 2;
-      const safeLeft = Math.random() * 88 + 2;
-      block.style.top = `${safeTop}%`;
-      block.style.left = `${safeLeft}%`;
-      block.style.transform = `translate(-50%, -50%) translateY(${Math.random() * 16 - 8}px)`;
+      const cardWidth = 260 + Math.random() * 280;
+      block.style.width = `${cardWidth}px`;
+
+      const maxLeft = Math.max(16, window.innerWidth - cardWidth - 20);
+      const maxTop = Math.max(16, window.innerHeight - 180);
+
+      block.style.left = `${Math.random() * maxLeft}px`;
+      block.style.top = `${Math.random() * maxTop}px`;
+      block.style.transform = `translateY(${Math.random() * 18 - 9}px)`;
 
       const lines = document.createElement('pre');
       lines.className = 'code-text';
@@ -485,15 +489,15 @@ checksum('about:blank').then((hash) => {
           requestAnimationFrame(() => setTimeout(reveal, typingSpeed));
         } else {
           setTimeout(() => {
-            block.animate(
-              [
-                { opacity: 0.96, filter: 'blur(0px)', transform: `translate(-50%, -50%) translateY(${driftY}px)` },
-                { opacity: 0, filter: 'blur(12px)', transform: `translate(-50%, -50%) translateY(${driftY + 10}px)` },
-              ],
-              { duration: 1400, fill: 'forwards', easing: 'ease-in-out' }
-            ).onfinish = () => block.remove();
-          }, 2200 + Math.random() * 1600);
-        }
+              block.animate(
+                [
+                  { opacity: 0.96, filter: 'blur(0px)', transform: `translateY(${driftY}px)` },
+                  { opacity: 0, filter: 'blur(12px)', transform: `translateY(${driftY + 10}px)` },
+                ],
+                { duration: 1400, fill: 'forwards', easing: 'ease-in-out' }
+              ).onfinish = () => block.remove();
+            }, 2200 + Math.random() * 1600);
+          }
       };
 
       requestAnimationFrame(() => block.classList.add('visible'));
